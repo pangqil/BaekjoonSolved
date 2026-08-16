@@ -1,65 +1,83 @@
 #include <algorithm>
+#include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
+//12시 39분
+//부분순열이고, sum은 k
+//길이가 짧은거 우선
+//길이가 짧다면, 시작인덱스가 작아야 함.
+vector<int> sequnces; 
+vector<pair<int,int>> arrs;
+int target;
 
-bool compare(pair<int,int> a,pair<int,int> b)
+bool compare(const pair<int,int> &a, const pair<int,int> &b)
 {
     int alen=a.second-a.first;
     int blen=b.second-b.first;
-    //길이가 짧은건 앞으로 가고, 같다면 시작인덱스가 작은것
-    if (alen!=blen)
+    
+    if (alen==blen)
     {
-        return alen<blen;
+        return a.first<b.first;
     }
     else
     {
-        return a.first<b.first;
+        return alen<blen;
     }
 }
 
 vector<int> solution(vector<int> sequence, int k) {
     vector<int> answer;
-    vector<pair<int,int>> seq;
+    sequnces=sequence;
+    target=k;
+    
     int lidx=0;
     int ridx=0;
-    int count=0;
     int sum=sequence[0];
-    int curlen=0;
-    int minlen=0;
     
-    while(lidx<sequence.size()&&ridx<sequence.size())
+    while (lidx<=ridx&&ridx<=sequnces.size()-1)
     {
-        if (sum==k)
+        if (target==sum)
         {
-            seq.push_back({lidx,ridx});
-            sum-=sequence[lidx];
+            arrs.push_back({lidx,ridx});
+            sum-=sequnces[lidx];
             lidx++;
         }
-        else if (sum>k)
+    
+        if (sum>target)
         {
-            sum-=sequence[lidx];
-            if (lidx==sequence.size()) break;
+            sum-=sequnces[lidx];
             lidx++;
+            
+            // dfs(sum+sequnces[idx+1], idx+1, lidx, ridx);
+            // dfs(sum, idx+1,lidx, ridx);
         }
-        else if (sum<k)
+        else if (target>sum)
         {
+            //sequnces.size()=5
+            //ridx=4
+            if (ridx+1>=sequnces.size()) break;
             ridx++;
-            if (ridx==sequence.size()) break;
-            sum+=sequence[ridx];
+            //arr[5] ridx=4;
+            sum+=sequnces[ridx];
+            // dfs(sum+sequnces[idx+1], idx+1, lidx, ridx);
+            // dfs(sum, idx+1,lidx, ridx);
         }
     }
     
-    sort(seq.begin(),seq.end(),compare);
-    
-    
-    answer.push_back(seq[0].first);
-    answer.push_back(seq[0].second);
+    sort(arrs.begin(),arrs.end(),compare);
+    answer.push_back(arrs[0].first);
+    answer.push_back(arrs[0].second);
     return answer;
 }
 
 int main()
 {
-    solution({1, 1, 1, 2, 3, 4, 5}, 5);
+    auto p=solution({1, 2, 3, 4, 5}, 7);
+    
+    for (auto k:p)
+    {
+        cout<<k<<endl;
+    }
 }
